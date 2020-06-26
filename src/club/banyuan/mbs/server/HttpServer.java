@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class myHTTPServer extends Thread {
+public class HttpServer extends Thread {
 
   static final String HTML_START =
       "<html>" +
@@ -20,7 +20,7 @@ public class myHTTPServer extends Thread {
   DataOutputStream outToClient = null;
 
 
-  public myHTTPServer(Socket client) {
+  public HttpServer(Socket client) {
     connectedClient = client;
   }
 
@@ -62,7 +62,7 @@ public class myHTTPServer extends Thread {
           String fileName = httpQueryString.replaceFirst("/", "");
 
           fileName = URLDecoder.decode(fileName);
-          File file = new File(Server.class.getResource("/pages").getPath(), fileName);
+          File file = new File(HttpServer.class.getResource("/pages").getPath(), fileName);
           if (file.isFile()) {
             sendResponse(200, file.getAbsolutePath(), true);
           } else {
@@ -102,7 +102,7 @@ public class myHTTPServer extends Thread {
         contentTypeLine = "Content-Type: \r\n";
       }
     } else {
-      responseString = myHTTPServer.HTML_START + responseString + myHTTPServer.HTML_END;
+      responseString = HttpServer.HTML_START + responseString + HttpServer.HTML_END;
       contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
     }
 
@@ -139,7 +139,7 @@ public class myHTTPServer extends Thread {
 
     while (true) {
       Socket connected = Server.accept();
-      (new myHTTPServer(connected)).start();
+      (new HttpServer(connected)).start();
     }
   }
 }
