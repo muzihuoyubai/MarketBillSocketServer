@@ -1,17 +1,10 @@
 package club.banyuan.mbs.server;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URLDecoder;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-public class HttpServer extends Thread {
+public class HttpServerBak extends Thread {
 
   static final String HTML_START =
       "<html>" +
@@ -27,7 +20,7 @@ public class HttpServer extends Thread {
   DataOutputStream outToClient = null;
 
 
-  public HttpServer(Socket client) {
+  public HttpServerBak(Socket client) {
     connectedClient = client;
   }
 
@@ -69,7 +62,7 @@ public class HttpServer extends Thread {
           String fileName = httpQueryString.replaceFirst("/", "");
 
           fileName = URLDecoder.decode(fileName);
-          File file = new File(HttpServer.class.getResource("/pages").getPath(), fileName);
+          File file = new File(HttpServerBak.class.getResource("/pages").getPath(), fileName);
           if (file.isFile()) {
             sendResponse(200, file.getAbsolutePath(), true);
           } else {
@@ -109,7 +102,7 @@ public class HttpServer extends Thread {
         contentTypeLine = "Content-Type: \r\n";
       }
     } else {
-      responseString = HttpServer.HTML_START + responseString + HttpServer.HTML_END;
+      responseString = HttpServerBak.HTML_START + responseString + HttpServerBak.HTML_END;
       contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
     }
 
@@ -146,7 +139,7 @@ public class HttpServer extends Thread {
 
     while (true) {
       Socket connected = Server.accept();
-      (new HttpServer(connected)).start();
+      (new HttpServerBak(connected)).start();
     }
   }
 }
