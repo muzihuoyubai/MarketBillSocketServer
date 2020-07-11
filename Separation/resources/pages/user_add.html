@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>超市账单管理系统</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css"/>
+</head>
+<div id="header">
+  <div class="title"></div>
+  <div class="welcome">欢迎您：admin</div>
+</div>
+<div id="section-left">
+  <ul class="left-menu">
+    <li><a href="bill_list.html" target="mainFrame"><img src="images/btn_bill.gif"/></a></li>
+    <li><a href="provider_list.html" target="mainFrame"><img src="images/btn_suppliers.gif"/></a>
+    </li>
+    <li><a href="user_list.html" target="mainFrame"><img src="images/btn_users.gif"/></a></li>
+    <li><a href="#" onClick="javaScript:alert('这里实现退出操作！')"><img src="images/btn_exit.gif"/></a>
+    </li>
+  </ul>
+</div>
+
+<div id="section-right" style="overflow: hidden">
+  <div class="main">
+    <div class="optitle clearfix">
+      <div class="title">用户管理&gt;&gt;</div>
+
+    </div>
+    <form id="form1" name="form1" method="post" action="user.do" onsubmit="return checkit();">
+      <input type="hidden" name="flag" value="doAdd">
+      <div class="content">
+        <table class="box"><font color="red"></font>
+          <tr>
+            <td class="field">用户编号：</td>
+            <td><input type="text" name="userId"  class="text"/> <font color="red">*</font></td>
+
+          </tr>
+          <tr>
+            <td class="field">用户名称：</td>
+            <td><input type="text" name="username" class="text"  /> <font color="red">*</font></td>
+          </tr>
+          <tr>
+            <td class="field">用户密码：</td>
+
+            <td><input type="password" name="password" class="text"  /> <font color="red">*</font></td>
+          </tr>
+          <tr>
+            <td class="field">确认密码：</td>
+            <td><input type="password" name="password1" class="text"/> <font color="red">*</font></td>
+          </tr>
+
+          <tr>
+            <td class="field">用户性别：</td>
+            <td><select name="sex" id="select">
+              <option value="0">女</option>
+              <option value="1">男</option>
+            </select></td>
+          </tr>
+
+          <tr>
+            <td class="field">用户年龄：</td>
+            <td><input type="text" name="age" class="text" /> <font color="red">*</font></td>
+          </tr>
+          <tr>
+            <td class="field">用户电话：</td>
+            <td><input type="text" name="mobile" class="text" /> <font color="red">*</font></td>
+
+          </tr>
+          <tr>
+            <td class="field">用户地址：</td>
+            <td><textarea name="address" id="textarea" class="text" cols="45" rows="5"></textarea></td>
+          </tr>
+          <tr>
+            <td class="field">用户权限：</td>
+
+            <td><input type="radio" name="auth" id="auth" value="0" checked="checked"/>普通用户
+              <input type="radio" name="auth" id="auth" value="1" />经理</td>
+          </tr>
+        </table>
+      </div>
+      <div class="buttons">
+        <input type="submit" name="button"  value="数据提交" class="input-button"/>
+        <input type="button" name="button"  onclick="window.location='user.do';" value="返回" class="input-button"/>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

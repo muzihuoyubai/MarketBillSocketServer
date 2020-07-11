@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>超市账单管理系统</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css"/>
+</head>
+<div id="header">
+  <div class="title"></div>
+  <div class="welcome">欢迎您：admin</div>
+</div>
+<div id="section-left">
+  <ul class="left-menu">
+    <li><a href="bill_list.html" target="mainFrame"><img src="images/btn_bill.gif"/></a></li>
+    <li><a href="provider_list.html" target="mainFrame"><img src="images/btn_suppliers.gif"/></a>
+    </li>
+    <li><a href="user_list.html" target="mainFrame"><img src="images/btn_users.gif"/></a></li>
+    <li><a href="#" onClick="javaScript:alert('这里实现退出操作！')"><img src="images/btn_exit.gif"/></a>
+    </li>
+  </ul>
+</div>
+
+<div id="section-right" style="overflow: hidden">
+  <div class="menu">
+
+    <table>
+      <tbody>
+      <tr>
+        <td>
+          <form method="post" action="user.do">
+            <input name="flag" value="search" class="input-text" type="hidden">
+            用户名称：<input name="userName" class="input-text" type="text">&nbsp;&nbsp;&nbsp;&nbsp;
+            <input value="查 询" type="submit">
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="main">
+
+    <div class="optitle clearfix">
+      <em><input value="添加数据" class="input-button" onclick="window.location='userAdd.html'"
+                 type="button"></em>
+      <div class="title">用户管理&gt;&gt;</div>
+    </div>
+    <div class="content">
+      <table class="list">
+        <tbody>
+        <tr>
+          <td width="70" height="29">
+            <div class="STYLE1" align="center">编号</div>
+          </td>
+          <td width="80">
+            <div class="STYLE1" align="center">用户名称</div>
+          </td>
+          <td width="100">
+            <div class="STYLE1" align="center">性别</div>
+          </td>
+          <td width="100">
+            <div class="STYLE1" align="center">年龄</div>
+          </td>
+
+          <td width="150">
+            <div class="STYLE1" align="center">电话</div>
+          </td>
+          <td width="150">
+            <div class="STYLE1" align="center">地址</div>
+          </td>
+          <td width="150">
+            <div class="STYLE1" align="center">权限</div>
+          </td>
+        </tr>
+
+        <tr>
+          <td height="23"><span class="STYLE1">1</span></td>
+          <td><span class="STYLE1"><a href="#" onclick="doit('mod',1)">admin</a></span></td>
+
+          <td><span class="STYLE1">女</span></td>
+          <td><span class="STYLE1">0</span></td>
+          <td><span class="STYLE1">0</span></td>
+          <td><span class="STYLE1"></span></td>
+          <td><span class="STYLE1">&nbsp;
+    </span></td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
