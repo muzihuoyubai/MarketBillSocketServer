@@ -43,12 +43,16 @@ public class PostFormServer extends Thread {
           new InputStreamReader(connectedClient.getInputStream()));
 
       MbsRequest request = MbsRequest.parse(in);
+      if (request == null) {
+        return;
+      }
       String path = request.getPath();
       if (request.isGet()) {
         if ("/".equals(path)) {
           responseFile("login.html", out);
         } else if (path.endsWith(".html") || path.startsWith("/css") || path
-            .startsWith("/images")) {
+            .startsWith("/images") || path
+            .startsWith("/js")) {
           responseFile(path, out);
         }
       } else {
@@ -57,10 +61,23 @@ public class PostFormServer extends Thread {
             if (login(request)) {
               out.writeBytes("HTTP/1.1 302 Found");
               out.writeBytes("\r\n");
-              out.writeBytes("Location: " + CONTEXT_ROOT + "bill_list.html");
+              out.writeBytes("Location: " + "http://" + request.getHost() + "/bill_list.html");
               out.writeBytes("\r\n");
             }
             break;
+          case "/server/provider/list":
+            String data = "{\"test\":\"哈哈哈哈\"}";
+            out.writeBytes("HTTP/1.1 200 OK");
+            out.writeBytes("\r\n");
+            out.writeBytes("Server: Java HTTPServer");
+            out.writeBytes("\r\n");
+            out.writeBytes("Content-Type: application/json; charset=utf-8");
+            out.writeBytes("\r\n");
+            out.writeBytes(("Content-Length: " + data.getBytes().length));
+            out.writeBytes("\r\n");
+            out.writeBytes("\r\n");
+            // 写json，不能用writeBytes 算的字节数不对
+            out.write(data.getBytes());
         }
       }
 
@@ -80,6 +97,7 @@ public class PostFormServer extends Thread {
 
     InputStream resourceAsStream = PostFormServer.class.getClassLoader()
         .getResourceAsStream("pages/" + path);
+    System.out.println(path);
     // BufferedReader reader = new BufferedReader(new InputStreamReader(resourceAsStream));
 
     // String statusLine = "HTTP/1.1 200 OK" + "\r\n";
@@ -91,6 +109,7 @@ public class PostFormServer extends Thread {
     content-length
      */
     out.writeBytes("HTTP/1.1 200 OK");
+    out.writeBytes("\r\n");
     out.writeBytes("Server: Java HTTPServer");
     out.writeBytes("\r\n");
     if (path.endsWith(".html")) {

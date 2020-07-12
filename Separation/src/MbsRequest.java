@@ -13,12 +13,16 @@ public class MbsRequest {
   private String path;
   private int contentLength;
   private String payload;
+  private String host;
 
 
   public static MbsRequest parse(BufferedReader in) throws IOException {
     String line;
     line = in.readLine();
     MbsRequest mbsRequest = new MbsRequest();
+    if (line == null) {
+      return null;
+    }
     // 提取前两位，获取请求方式和路径
     // POST / HTTP/1.1
     StringTokenizer stringTokenizer = new StringTokenizer(line);
@@ -27,6 +31,9 @@ public class MbsRequest {
     while ((line = in.readLine()) != null && (line.length() != 0)) {
       if (line.contains("Content-Length:")) {
         mbsRequest.setContentLength(Integer.parseInt(line.replace("Content-Length: ", "")));
+      }
+      if (line.contains("Host:")) {
+        mbsRequest.setHost(line.replace("Host: ", ""));
       }
     }
     int contentLength = mbsRequest.getContentLength();
@@ -77,5 +84,13 @@ public class MbsRequest {
 
   public void setPayload(String payload) {
     this.payload = payload;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
   }
 }
