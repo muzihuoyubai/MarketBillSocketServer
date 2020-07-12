@@ -136,6 +136,25 @@ public class PostFormServer extends Thread {
               responseJson(out, "{}");
             }
           }
+          break;
+          case "/server/provider/delete": {
+            String payload = request.getJsonData();
+            Map<String, String> map = JSONObject
+                .parseObject(payload, new TypeReference<>() {
+                });
+            Optional<Provider> id = providerList.stream()
+                .filter(t -> t.getId() == Integer.parseInt(map.get("id"))).findFirst();
+            if (id.isPresent()) {
+              providerList.remove(id.get());
+              out.writeBytes("HTTP/1.1 200 OK");
+              out.writeBytes("\r\n");
+              out.writeBytes("Server: Java HTTPServer");
+              out.writeBytes("\r\n");
+            } else {
+              // TODO exception
+            }
+          }
+          break;
         }
       }
 
