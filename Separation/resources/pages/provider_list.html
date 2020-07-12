@@ -95,7 +95,6 @@
             </div>
           </td>
         </tr>
-
         </tbody>
       </table>
     </div>
@@ -103,7 +102,48 @@
 </div>
 <script src="js/jquery-3.5.1.min.js"></script>
 <script>
+  function buildProviderRow(provider, providerNodeTemplate) {
+    let lineNode = providerNodeTemplate.clone();
+    // 找到以属性名作为class的标签，将text替换为属性的值
+    for (let prop in provider) {
+      lineNode.find("." + prop).text(provider[prop]);
+      lineNode.show(); // clone 的节点默认是隐藏的，需要让添加的行显示
+    }
+    return lineNode;
+  }
+
+  function appendProviderList(result) {
+    let providerNodeTemplate = $("#provider_title").clone();
+    // clone 之后不需要id属性
+    providerNodeTemplate.removeAttr("id");
+    // result 返回的是一个 provider 数组，这里遍历数组，将每个provider添加到表格中
+    for (let index in result) {
+      let lineNode = buildProviderRow(result[index], providerNodeTemplate);
+      $("#provider_list").append(lineNode);
+    }
+  }
+
+  /*
+ 将指定id的form 内容转换成json字符串
+ 返回json字符串
+  */
+  function form2JsonString(formId) {
+    // 序列化成 key=value&key1=value1 的字符串
+    let paramArray = $('#' + formId).serializeArray();
+    let jsonObj = {};
+    $(paramArray).each(function () {
+      jsonObj[this.name] = this.value;
+    });
+    // json对象再转换成json字符串
+    return JSON.stringify(jsonObj);
+  }
+
   $(function () {
+    $.ajaxError(function (e, xhr) {
+      console.log(xhr.responseText);
+      alert("操作失败:" + responseText);
+    });
+    // 页面加载完成后，加载列表数据
     $.ajax({
       type: "post",
       contentType: "application/json;charset=UTF-8",
@@ -112,19 +152,7 @@
       success: function (result) {
         let providerNodeTemplate = $("#provider_title").clone();
         providerNodeTemplate.removeAttr("id");
-        for (let index in result) {
-          let oneProvider = result[index];
-          let lineNode = providerNodeTemplate.clone();
-          // 找到以属性名作为css类的div，将内容替换为属性的值
-          for (let prop in oneProvider) {
-            lineNode.find("." + prop).text(oneProvider[prop]);
-            lineNode.show();
-          }
-          $("#provider_list").append(lineNode);
-        }
-
-      },
-      error: function (e) {
+        appendProviderList(result, providerNodeTemplate);
 
       }
     });
@@ -147,13 +175,13 @@
         success: function (result) {
           // 清空表格
           target.remove();
-        },
-        error: function (e) {
-
         }
       });
     })
 
+    /**
+     * 组合查询
+     */
     $("#provider_search_btn").click(function (e) {
       e.preventDefault();
       $.ajax({
@@ -164,40 +192,11 @@
         success: function (result) {
           // 清空表格
           $("#provider_title").nextAll().remove();
-
-          let providerNodeTemplate = $("#provider_title").clone();
-          providerNodeTemplate.removeAttr("id");
-          for (let index in result) {
-            let oneProvider = result[index];
-            let lineNode = providerNodeTemplate.clone();
-            // 找到以属性名作为css类的div，将内容替换为属性的值
-            for (let prop in oneProvider) {
-              lineNode.find("." + prop).text(oneProvider[prop]);
-              lineNode.show();
-            }
-            $("#provider_list").append(lineNode);
-          }
-
-        },
-        error: function (e) {
-
+          appendProviderList(result);
         }
       });
     });
-
   });
-
-  function form2JsonString(formId) {
-
-    let paramArray = $('#' + formId).serializeArray();
-    /*请求参数转json对象*/
-    let jsonObj = {};
-    $(paramArray).each(function () {
-      jsonObj[this.name] = this.value;
-    });
-    // json对象再转换成json字符串
-    return JSON.stringify(jsonObj);
-  }
 </script>
 </body>
 </html>
