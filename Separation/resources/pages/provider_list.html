@@ -101,6 +101,7 @@
   </div>
 </div>
 <script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/common.js"></script>
 <script>
   function buildProviderRow(provider, providerNodeTemplate) {
     let lineNode = providerNodeTemplate.clone();
@@ -123,26 +124,7 @@
     }
   }
 
-  /*
- 将指定id的form 内容转换成json字符串
- 返回json字符串
-  */
-  function form2JsonString(formId) {
-    // 序列化成 key=value&key1=value1 的字符串
-    let paramArray = $('#' + formId).serializeArray();
-    let jsonObj = {};
-    $(paramArray).each(function () {
-      jsonObj[this.name] = this.value;
-    });
-    // json对象再转换成json字符串
-    return JSON.stringify(jsonObj);
-  }
-
   $(function () {
-    $.ajaxError(function (e, xhr) {
-      console.log(xhr.responseText);
-      alert("操作失败:" + responseText);
-    });
     // 页面加载完成后，加载列表数据
     $.ajax({
       type: "post",

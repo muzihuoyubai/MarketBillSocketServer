@@ -63,12 +63,11 @@
 </div>
 
 <script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/common.js"></script>
 <script>
   $(function () {
     let id = getURLParameter("id");
-    if (id === undefined || id.length === 0) {
-
-    } else {
+    if (id !== undefined && id.length !== 0) {
       $.ajax({
         type: "post",
         contentType: "application/json;charset=UTF-8",
@@ -78,34 +77,17 @@
           if (!$.isEmptyObject(result)) {
             $("#flag").val(id);
             let lineNode = $("tbody");
-            console.log(lineNode);
             for (let prop in result) {
               // 找到以属性名作为css类的div，将内容替换为属性的值
-              console.log(prop);
-              console.log(lineNode.find("." + prop));
               lineNode.find("[name='" + prop + "']").val(result[prop]);
             }
           } else {
             alert("id不存在");
           }
-        },
-        error: function (e) {
-
         }
       });
     }
   });
-
-  function getURLParameter(sParam) {
-    let sPageURL = window.location.search.substring(1);
-    let sURLVariables = sPageURL.split('&');
-    for (let i = 0; i < sURLVariables.length; i++) {
-      let sParameterName = sURLVariables[i].split('=');
-      if (sParameterName[0] === sParam) {
-        return sParameterName[1];
-      }
-    }
-  }
 </script>
 </body>
 </html>
