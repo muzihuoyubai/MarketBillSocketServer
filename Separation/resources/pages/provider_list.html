@@ -28,11 +28,13 @@
       <tbody>
       <tr>
         <td>
-          <form method="post" action="provider.do">
+          <form id="provider_search" method="post">
             <input name="flag" value="search" type="hidden">
-            供应商名称：<input name="providerName" class="input-text" type="text"> &nbsp;&nbsp;&nbsp;&nbsp;供应商描述：<input
-              name="providerDesc" class="input-text" type="text">&nbsp;&nbsp;&nbsp;&nbsp;<input
-              value="组 合 查 询" type="submit">
+            供应商名称：
+            <input name="name" class="input-text" type="text"> &nbsp;&nbsp;&nbsp;&nbsp;
+            供应商描述：
+            <input name="desc" class="input-text" type="text">&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="provider_search_btn">组 合 查 询</button>
           </form>
         </td>
       </tr>
@@ -41,7 +43,7 @@
   </div>
   <div class="main">
     <div class="optitle clearfix">
-      <em><input value="添加数据" class="input-button" onclick="window.location='provider_add.html'"
+      <em><input value="添加数据" class="input-button" onclick="window.location='provider_modify.html'"
                  type="button"></em>
       <div class="title">供应商管理&gt;&gt;</div>
     </div>
@@ -130,9 +132,53 @@
     $("#provider_list").on("click", ".update", function (e) {
       e.preventDefault();
       let id = $(this).parents("tr").find(".id").text();
-      window.location.href = "provider_add.html?id=" + id;
+      window.location.href = "provider_modify.html?id=" + id;
     })
+
+    $("#provider_search_btn").click(function (e) {
+      e.preventDefault();
+      $.ajax({
+        type: "post",
+        contentType: "application/json;charset=UTF-8",
+        url: "server/provider/list",
+        data: form2JsonString("provider_search"),
+        success: function (result) {
+          // 清空表格
+          $("#provider_title").nextAll().remove();
+
+          let providerNodeTemplate = $("#provider_title").clone();
+          providerNodeTemplate.removeAttr("id");
+          for (let index in result) {
+            let oneProvider = result[index];
+            let lineNode = providerNodeTemplate.clone();
+            // 找到以属性名作为css类的div，将内容替换为属性的值
+            for (let prop in oneProvider) {
+              lineNode.find("." + prop).text(oneProvider[prop]);
+              lineNode.show();
+            }
+            $("#provider_list").append(lineNode);
+          }
+
+        },
+        error: function (e) {
+
+        }
+      });
+    });
+
   });
+
+  function form2JsonString(formId) {
+
+    let paramArray = $('#' + formId).serializeArray();
+    /*请求参数转json对象*/
+    let jsonObj={};
+    $(paramArray).each(function(){
+      jsonObj[this.name]=this.value;
+    });
+    // json对象再转换成json字符串
+    return JSON.stringify(jsonObj);
+  }
 </script>
 </body>
 </html>

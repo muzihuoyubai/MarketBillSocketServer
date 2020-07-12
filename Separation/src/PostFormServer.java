@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PostFormServer extends Thread {
 
@@ -67,28 +68,40 @@ public class PostFormServer extends Thread {
         switch (path) {
           case "/server/login":
             if (login(request)) {
-              out.writeBytes("HTTP/1.1 302 Found");
-              out.writeBytes("\r\n");
-              out.writeBytes("Location: " + "http://" + request.getHost() + "/bill_list.html");
-              out.writeBytes("\r\n");
+              responseRedirect(out, request, "/bill_list.html");
             }
             break;
           case "/server/provider/list": {
-            String data = JSONObject.toJSONString(providerList);
-            out.writeBytes("HTTP/1.1 200 OK");
-            out.writeBytes("\r\n");
-            out.writeBytes("Server: Java HTTPServer");
-            out.writeBytes("\r\n");
-            out.writeBytes("Content-Type: application/json; charset=utf-8");
-            out.writeBytes("\r\n");
-            out.writeBytes(("Content-Length: " + data.getBytes().length));
-            out.writeBytes("\r\n");
-            out.writeBytes("\r\n");
-            // 写json，不能用writeBytes 算的字节数不对
-            out.write(data.getBytes());
+            String payload = request.getPayload();
+            if (payload == null) {
+              responseJson(out, JSONObject.toJSONString(providerList));
+            }
+            Provider provider = JSONObject.parseObject(payload, Provider.class);
+            List<Provider> rlt = providerList.stream().filter(t -> {
+              if (provider == null) {
+                return true;
+              }
+              String name = provider.getName();
+              if (name != null && name.trim().length() > 0) {
+                return t.getName().contains(name);
+              } else {
+                return true;
+              }
+            }).filter(t -> {
+              if (provider == null) {
+                return true;
+              }
+              String desc = provider.getDesc();
+              if (desc != null && desc.trim().length() > 0) {
+                return t.getDesc().contains(desc);
+              } else {
+                return true;
+              }
+            }).collect(Collectors.toList());
+            responseJson(out, JSONObject.toJSONString(rlt));
           }
           break;
-          case "/server/provider/add": {
+          case "/server/provider/modify": {
             Map<String, String> formData = request.getFormData();
             Provider provider = JSONObject
                 .parseObject(JSONObject.toJSONString(formData), Provider.class);
@@ -107,10 +120,7 @@ public class PostFormServer extends Thread {
               }
             }
 
-            out.writeBytes("HTTP/1.1 302 Found");
-            out.writeBytes("\r\n");
-            out.writeBytes("Location: " + "http://" + request.getHost() + "/provider_list.html");
-            out.writeBytes("\r\n");
+            responseRedirect(out, request, "/provider_list.html");
           }
           break;
           case "/server/provider/get": {
@@ -121,30 +131,9 @@ public class PostFormServer extends Thread {
             Optional<Provider> id = providerList.stream()
                 .filter(t -> t.getId() == Integer.parseInt(map.get("id"))).findFirst();
             if (id.isPresent()) {
-              String data = JSONObject.toJSONString(id.get());
-              out.writeBytes("HTTP/1.1 200 OK");
-              out.writeBytes("\r\n");
-              out.writeBytes("Server: Java HTTPServer");
-              out.writeBytes("\r\n");
-              out.writeBytes("Content-Type: application/json; charset=utf-8");
-              out.writeBytes("\r\n");
-              out.writeBytes(("Content-Length: " + data.getBytes().length));
-              out.writeBytes("\r\n");
-              out.writeBytes("\r\n");
-              // 写json，不能用writeBytes 算的字节数不对
-              out.write(data.getBytes());
+              responseJson(out, JSONObject.toJSONString(id.get()));
             } else {
-              String data = "{}";
-              out.writeBytes("HTTP/1.1 200 OK");
-              out.writeBytes("\r\n");
-              out.writeBytes("Server: Java HTTPServer");
-              out.writeBytes("\r\n");
-              out.writeBytes("Content-Type: application/json; charset=utf-8");
-              out.writeBytes("\r\n");
-              out.writeBytes(("Content-Length: " + data.getBytes().length));
-              out.writeBytes("\r\n");
-              out.writeBytes("\r\n");
-              out.write(data.getBytes());
+              responseJson(out, "{}");
             }
           }
         }
@@ -156,6 +145,28 @@ public class PostFormServer extends Thread {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private void responseRedirect(DataOutputStream out, MbsRequest request, String s)
+      throws IOException {
+    out.writeBytes("HTTP/1.1 302 Found");
+    out.writeBytes("\r\n");
+    out.writeBytes("Location: " + "http://" + request.getHost() + s);
+    out.writeBytes("\r\n");
+  }
+
+  private void responseJson(DataOutputStream out, String s) throws IOException {
+    String data = s;
+    out.writeBytes("HTTP/1.1 200 OK");
+    out.writeBytes("\r\n");
+    out.writeBytes("Server: Java HTTPServer");
+    out.writeBytes("\r\n");
+    out.writeBytes("Content-Type: application/json; charset=utf-8");
+    out.writeBytes("\r\n");
+    out.writeBytes(("Content-Length: " + data.getBytes().length));
+    out.writeBytes("\r\n");
+    out.writeBytes("\r\n");
+    out.write(data.getBytes());
   }
 
   private boolean login(MbsRequest request) {
@@ -205,13 +216,7 @@ public class PostFormServer extends Thread {
       count = resourceAsStream.read(buf);
     }
 
-    // String line = reader.readLine();
-    // while (line != null) {
-    //   out.println(reader.readLine());
-    //   line = reader.readLine();
-    // }
     resourceAsStream.close();
-    // String contentLengthLine = "Content-Length: " + fin.available() + "\r\n";
   }
 
 
