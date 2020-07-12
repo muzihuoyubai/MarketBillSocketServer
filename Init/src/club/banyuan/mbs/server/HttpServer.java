@@ -141,12 +141,14 @@ public class HttpServer extends Thread {
 
   public static void main(String args[]) throws Exception {
 
-    ServerSocket Server = new ServerSocket(5000, 10, InetAddress.getByName("127.0.0.1"));
+    ServerSocket Server = new ServerSocket(9000, 10, InetAddress.getByName("127.0.0.1"));
     System.out.println("TCPServer Waiting for client on port 5000");
 
     while (true) {
       Socket connected = Server.accept();
-      (new HttpServer(connected)).start();
+      // (new HttpServer(connected)).start();
+
+      new HttpServer(connected).run();
     }
   }
 }
