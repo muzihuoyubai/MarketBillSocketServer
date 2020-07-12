@@ -1,3 +1,5 @@
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -9,13 +11,19 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class PostFormServer extends Thread {
 
   Socket connectedClient = null;
-  BufferedReader inFromClient = null;
-  DataOutputStream outToClient = null;
   String CONTEXT_ROOT = "http://localhost:5000/";
+  private static List<Provider> providerList = new ArrayList<>();
+  private static int providerId = 1;
 
 
   public PostFormServer(Socket client) {
@@ -30,7 +38,7 @@ public class PostFormServer extends Thread {
     while (true) {
       Socket clientSocket = Server.accept();
       PostFormServer postFormServer = new PostFormServer(clientSocket);
-      postFormServer.run();
+      postFormServer.start();
 
     }
   }
@@ -50,7 +58,7 @@ public class PostFormServer extends Thread {
       if (request.isGet()) {
         if ("/".equals(path)) {
           responseFile("login.html", out);
-        } else if (path.endsWith(".html") || path.startsWith("/css") || path
+        } else if (path.contains(".html") || path.startsWith("/css") || path
             .startsWith("/images") || path
             .startsWith("/js")) {
           responseFile(path, out);
@@ -65,8 +73,8 @@ public class PostFormServer extends Thread {
               out.writeBytes("\r\n");
             }
             break;
-          case "/server/provider/list":
-            String data = "{\"test\":\"哈哈哈哈\"}";
+          case "/server/provider/list": {
+            String data = JSONObject.toJSONString(providerList);
             out.writeBytes("HTTP/1.1 200 OK");
             out.writeBytes("\r\n");
             out.writeBytes("Server: Java HTTPServer");
@@ -78,6 +86,67 @@ public class PostFormServer extends Thread {
             out.writeBytes("\r\n");
             // 写json，不能用writeBytes 算的字节数不对
             out.write(data.getBytes());
+          }
+          break;
+          case "/server/provider/add": {
+            Map<String, String> formData = request.getFormData();
+            Provider provider = JSONObject
+                .parseObject(JSONObject.toJSONString(formData), Provider.class);
+            if (provider.getId() == 0) {
+              provider.setId(providerId++);
+              providerList.add(provider);
+            } else {
+              Optional<Provider> id = providerList.stream()
+                  .filter(t -> t.getId() == provider.getId()).findFirst();
+              if (id.isPresent()) {
+                providerList.remove(id.get());
+                providerList.add(provider);
+                providerList.sort(Comparator.comparingInt(Provider::getId));
+              } else {
+                //TODO Exception
+              }
+            }
+
+            out.writeBytes("HTTP/1.1 302 Found");
+            out.writeBytes("\r\n");
+            out.writeBytes("Location: " + "http://" + request.getHost() + "/provider_list.html");
+            out.writeBytes("\r\n");
+          }
+          break;
+          case "/server/provider/get": {
+            String payload = request.getJsonData();
+            Map<String, String> map = JSONObject
+                .parseObject(payload, new TypeReference<>() {
+                });
+            Optional<Provider> id = providerList.stream()
+                .filter(t -> t.getId() == Integer.parseInt(map.get("id"))).findFirst();
+            if (id.isPresent()) {
+              String data = JSONObject.toJSONString(id.get());
+              out.writeBytes("HTTP/1.1 200 OK");
+              out.writeBytes("\r\n");
+              out.writeBytes("Server: Java HTTPServer");
+              out.writeBytes("\r\n");
+              out.writeBytes("Content-Type: application/json; charset=utf-8");
+              out.writeBytes("\r\n");
+              out.writeBytes(("Content-Length: " + data.getBytes().length));
+              out.writeBytes("\r\n");
+              out.writeBytes("\r\n");
+              // 写json，不能用writeBytes 算的字节数不对
+              out.write(data.getBytes());
+            } else {
+              String data = "{}";
+              out.writeBytes("HTTP/1.1 200 OK");
+              out.writeBytes("\r\n");
+              out.writeBytes("Server: Java HTTPServer");
+              out.writeBytes("\r\n");
+              out.writeBytes("Content-Type: application/json; charset=utf-8");
+              out.writeBytes("\r\n");
+              out.writeBytes(("Content-Length: " + data.getBytes().length));
+              out.writeBytes("\r\n");
+              out.writeBytes("\r\n");
+              out.write(data.getBytes());
+            }
+          }
         }
       }
 

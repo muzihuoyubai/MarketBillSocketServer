@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class MbsRequest {
@@ -67,7 +69,12 @@ public class MbsRequest {
   }
 
   public void setPath(String path) {
-    this.path = path;
+    if (path.contains("?")) {
+      this.path = path.substring(0, path.indexOf("?"));
+      this.payload = path.substring(path.indexOf("?") + 1);
+    } else {
+      this.path = path;
+    }
   }
 
   public int getContentLength() {
@@ -93,4 +100,26 @@ public class MbsRequest {
   public void setHost(String host) {
     this.host = host;
   }
+
+  public Map<String, String> getFormData() {
+    StringTokenizer stringTokenizer = new StringTokenizer(payload, "&|=");
+    Map<String, String> map = new HashMap<>();
+    while (stringTokenizer.hasMoreTokens()) {
+      map.put(stringTokenizer.nextToken(), stringTokenizer.nextToken());
+    }
+    return map;
+  }
+
+  public String getJsonData() {
+    return payload;
+  }
+
+  // public static void main(String[] args) {
+  //   String s = "flag=doAdd&proName=123&proDesc=123&phone=123&contact=123&button=提交";
+  //   StringTokenizer stringTokenizer = new StringTokenizer(s, "&|=");
+  //   System.out.println(stringTokenizer.nextToken());
+  //   System.out.println(stringTokenizer.nextToken());
+  //   System.out.println(stringTokenizer.nextToken());
+  //   System.out.println(stringTokenizer.nextToken());
+  // }
 }

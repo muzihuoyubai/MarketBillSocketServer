@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>超市账单管理系统</title>
   <link type="text/css" rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="data:image/ico;base64,aWNv">
 </head>
 <div id="header">
   <div class="title"></div>
@@ -47,7 +48,7 @@
 
     <div class="content">
       <table class="list">
-        <tbody>
+        <tbody id="provider_list">
         <tr>
           <td width="70" height="29">
             <div class="STYLE1" align="center">编号</div>
@@ -65,6 +66,32 @@
           <td width="100">
             <div class="STYLE1" align="center">电话</div>
           </td>
+          <td width="100">
+            <div class="STYLE1" align="center">操作</div>
+          </td>
+        </tr>
+        <tr id="provider_title" style="display: none">
+          <td>
+            <div class="id" align="center">编号</div>
+          </td>
+          <td>
+            <div class="name" align="center">供应商名称</div>
+          </td>
+          <td>
+            <div class="desc" align="center">供应商描述</div>
+          </td>
+          <td>
+            <div class="contactPerson" align="center">联系人</div>
+          </td>
+          <td>
+            <div class="phone" align="center">电话</div>
+          </td>
+          <td>
+            <div class="operation" align="center">
+              <a href="" class="update">修改</a>
+              <a href="" class="delete">删除</a>
+            </div>
+          </td>
         </tr>
 
         </tbody>
@@ -81,11 +108,29 @@
       url: "server/provider/list",
       // data
       success: function (result) {
-        console.log(result);
+        let providerNodeTemplate = $("#provider_title").clone();
+        providerNodeTemplate.removeAttr("id");
+        for (let index in result) {
+          let oneProvider = result[index];
+          let lineNode = providerNodeTemplate.clone();
+          // 找到以属性名作为css类的div，将内容替换为属性的值
+          for (let prop in oneProvider) {
+            lineNode.find("." + prop).text(oneProvider[prop]);
+            lineNode.show();
+          }
+          $("#provider_list").append(lineNode);
+        }
+
       },
       error: function (e) {
 
       }
+    });
+
+    $("#provider_list").on("click", ".update", function (e) {
+      e.preventDefault();
+      let id = $(this).parents("tr").find(".id").text();
+      window.location.href = "provider_add.html?id=" + id;
     })
   });
 </script>
