@@ -1,3 +1,5 @@
+package club.banyuan.entity;
+
 public class Provider {
 
   private int id;

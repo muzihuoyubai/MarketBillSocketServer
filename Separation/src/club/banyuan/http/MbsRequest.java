@@ -1,8 +1,8 @@
-import java.io.BufferedInputStream;
+package club.banyuan.http;
+
+import com.alibaba.fastjson.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -110,8 +110,8 @@ public class MbsRequest {
     return map;
   }
 
-  public String getJsonData() {
-    return payload;
+  public <T> T getJsonData(Class<T> ref) {
+    return JSONObject.parseObject(payload, ref);
   }
 
   // public static void main(String[] args) {
