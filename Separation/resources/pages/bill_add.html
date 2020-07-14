@@ -25,18 +25,19 @@
 <div id="section-right" style="overflow: hidden">
   <div class="menu">
     <form method="get" action="">
-      商品名称：<input type="text" name="productName" class="input-text" />&nbsp;&nbsp;&nbsp;&nbsp;
+      商品名称：<input type="text" name="productName" class="input-text"/>&nbsp;&nbsp;&nbsp;&nbsp;
       是否付款：<select name="payStatus">
       <option value="">请选择</option>
       <option value="1">已付款</option>
       <option value="0">未付款</option>
     </select>&nbsp;&nbsp;&nbsp;&nbsp;
-      <input type="submit" name="submit" value="组合查询" class="button" />
+      <input type="submit" name="submit" value="组合查询" class="button"/>
     </form>
   </div>
   <div class="main">
     <div class="optitle clearfix">
-      <em><input type="button" name="button" value="添加数据" class="input-button" onclick="location.href='modify.html'" /></em>
+      <em><input type="button" name="button" value="添加数据" class="input-button"
+                 onclick="location.href='modify.html'"/></em>
       <div class="title">账单管理&gt;&gt;</div>
     </div>
     <form method="post">
@@ -44,11 +45,28 @@
         <table class="box">
           <tr>
             <td class="field">账单编号：</td>
-            <td><input type="text" name="billNum" class="text" /></td>
+            <td><input type="text" name="billNum" class="text"/></td>
+          </tr>
+          <tr>
+            <td class="field">供应商：</td>
+            <td><input list="provider" class="text">
+              <datalist id="provider">
+                <option>Bavette</option>
+                <option>Cannelloni</option>
+                <option>Fiorentine</option>
+                <option>Gnocchi</option>
+                <option>Pappardelle</option>
+                <option>Penne lisce</option>
+                <option>Pici</option>
+                <option>Rigatoni</option>
+                <option>Spaghetti</option>
+                <option>Tagliatelle</option>
+              </datalist>
+            </td>
           </tr>
           <tr>
             <td class="field">交易金额：</td>
-            <td><input type="text" name="money" class="text" /></td>
+            <td><input type="text" name="money" class="text"/></td>
           </tr>
           <tr>
             <td class="field">商品描述：</td>
@@ -63,8 +81,9 @@
         </table>
       </div>
       <div class="buttons">
-        <input type="submit" name="submit" value="确认" class="input-button" />
-        <input type="button" name="button" value="返回" class="input-button" onclick="history.back();" />
+        <input type="submit" name="submit" value="确认" class="input-button"/>
+        <input type="button" name="button" value="返回" class="input-button"
+               onclick="history.back();"/>
       </div>
     </form>
   </div>
