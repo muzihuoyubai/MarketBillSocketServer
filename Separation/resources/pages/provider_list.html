@@ -13,7 +13,7 @@
 <div id="section-left">
   <ul class="left-menu">
     <li><a href="bill_list.html" target="mainFrame"><img src="images/btn_bill.gif"/></a></li>
-    <li><a href="provider_list.html" target="mainFrame"><img src="images/btn_suppliers.gif"/></a>
+    <li><a href="provider-list.html" target="mainFrame"><img src="images/btn_suppliers.gif"/></a>
     </li>
     <li><a href="user_list.html" target="mainFrame"><img src="images/btn_users.gif"/></a></li>
     <li><a href="#" onClick="javaScript:alert('这里实现退出操作！')"><img src="images/btn_exit.gif"/></a>
@@ -50,7 +50,7 @@
 
     <div class="content">
       <table class="list">
-        <tbody id="provider_list">
+        <tbody id="provider-list">
         <tr>
           <td width="70" height="29">
             <div class="STYLE1" align="center">编号</div>
@@ -72,7 +72,7 @@
             <div class="STYLE1" align="center">操作</div>
           </td>
         </tr>
-        <tr id="provider_title" style="display: none">
+        <tr id="provider-title" style="display: none">
           <td>
             <div class="id" align="center">编号</div>
           </td>
@@ -114,13 +114,13 @@
   }
 
   function appendProviderList(result) {
-    let providerNodeTemplate = $("#provider_title").clone();
+    let providerNodeTemplate = $("#provider-title").clone();
     // clone 之后不需要id属性
     providerNodeTemplate.removeAttr("id");
     // result 返回的是一个 provider 数组，这里遍历数组，将每个provider添加到表格中
     for (let index in result) {
       let lineNode = buildProviderRow(result[index], providerNodeTemplate);
-      $("#provider_list").append(lineNode);
+      $("#provider-list").append(lineNode);
     }
   }
 
@@ -132,20 +132,20 @@
       url: "server/provider/list",
       // data
       success: function (result) {
-        let providerNodeTemplate = $("#provider_title").clone();
-        providerNodeTemplate.removeAttr("id");
-        appendProviderList(result, providerNodeTemplate);
+        // let providerNodeTemplate = $("#provider-title").clone();
+        // providerNodeTemplate.removeAttr("id");
+        appendProviderList(result);
 
       }
     });
 
-    $("#provider_list").on("click", ".update", function (e) {
+    $("#provider-list").on("click", ".update", function (e) {
       e.preventDefault();
       let id = $(this).parents("tr").find(".id").text();
       window.location.href = "provider_modify.html?id=" + id;
     })
 
-    $("#provider_list").on("click", ".delete", function (e) {
+    $("#provider-list").on("click", ".delete", function (e) {
       e.preventDefault();
       let target = $(this).parents("tr");
       let id = $(this).parents("tr").find(".id").text();
@@ -173,7 +173,7 @@
         data: form2JsonString("provider_search"),
         success: function (result) {
           // 清空表格
-          $("#provider_title").nextAll().remove();
+          $("#provider-title").nextAll().remove();
           appendProviderList(result);
         }
       });

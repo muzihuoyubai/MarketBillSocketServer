@@ -1,8 +1,10 @@
 package club.banyuan.http;
 
 import club.banyuan.entity.Provider;
+import club.banyuan.entity.User;
 import club.banyuan.exception.RequestException;
 import club.banyuan.service.ProviderService;
+import club.banyuan.service.UserService;
 import com.alibaba.fastjson.JSONObject;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -19,6 +21,7 @@ public class HttpServer extends Thread {
   private Socket connectedClient;
 
   private ProviderService providerService = new ProviderService();
+  private UserService userService = new UserService();
 
 
   public HttpServer(Socket client) {
@@ -101,6 +104,40 @@ public class HttpServer extends Thread {
             responseOk(out);
           }
           break;
+          case "/server/user/list": {
+            String payload = request.getPayload();
+            if (payload == null) {
+              responseJson(out, userService.getUserList());
+            } else {
+              User user = JSONObject.parseObject(payload, User.class);
+              responseJson(out, userService.getUserList(user));
+            }
+          }
+          break;
+          case "/server/user/modify": {
+            Map<String, String> formData = request.getFormData();
+            User user = JSONObject
+                .parseObject(JSONObject.toJSONString(formData), User.class);
+            if (user.getId() == 0) {
+              userService.addUser(user);
+            } else {
+              userService.updateUser(user);
+            }
+            responseRedirect(out, request, "/user_list.html");
+          }
+          break;
+          case "/server/user/get": {
+            User user = request.getJsonData(User.class);
+            User userById = userService.getUserById(user.getId());
+            responseJson(out, userById);
+          }
+          break;
+          case "/server/user/delete": {
+            User user = request.getJsonData(User.class);
+            userService.deleteUserById(user.getId());
+            responseOk(out);
+          }
+          break;
         }
       }
 
@@ -115,8 +152,6 @@ public class HttpServer extends Thread {
         }
         if (out != null) {
           out.writeBytes("HTTP/1.1 " + status.response());
-          out.writeBytes("\r\n");
-          out.writeBytes("Server: Java HTTPServer");
           out.writeBytes("\r\n");
         }
       } catch (IOException ioException) {
@@ -134,8 +169,6 @@ public class HttpServer extends Thread {
 
   private static void responseOk(DataOutputStream out) throws IOException {
     out.writeBytes("HTTP/1.1 200 OK");
-    out.writeBytes("\r\n");
-    out.writeBytes("Server: Java HTTPServer");
     out.writeBytes("\r\n");
   }
 
