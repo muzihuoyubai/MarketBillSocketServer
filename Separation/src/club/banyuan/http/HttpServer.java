@@ -1,8 +1,10 @@
 package club.banyuan.http;
 
+import club.banyuan.entity.Bill;
 import club.banyuan.entity.Provider;
 import club.banyuan.entity.User;
 import club.banyuan.exception.RequestException;
+import club.banyuan.service.BillService;
 import club.banyuan.service.ProviderService;
 import club.banyuan.service.UserService;
 import com.alibaba.fastjson.JSONObject;
@@ -14,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Map;
 
 public class HttpServer extends Thread {
@@ -22,6 +25,7 @@ public class HttpServer extends Thread {
 
   private ProviderService providerService = new ProviderService();
   private UserService userService = new UserService();
+  private BillService billService = new BillService();
 
 
   public HttpServer(Socket client) {
@@ -138,10 +142,48 @@ public class HttpServer extends Thread {
             responseOk(out);
           }
           break;
+          case "/server/bill/list": {
+            String payload = request.getPayload();
+            List<Bill> billList;
+            if (payload == null) {
+              billList = billService.getBillList();
+            } else {
+              Bill bill = JSONObject.parseObject(payload, Bill.class);
+              billList = billService.getBillList(bill);
+            }
+            loadProviderName(billList);
+            responseJson(out, billList);
+          }
+          break;
+          case "/server/bill/modify": {
+            Map<String, String> formData = request.getFormData();
+            Bill bill = JSONObject
+                .parseObject(JSONObject.toJSONString(formData), Bill.class);
+            if (bill.getId() == 0) {
+              billService.addBill(bill);
+            } else {
+              billService.updateBill(bill);
+            }
+            responseRedirect(out, request, "/bill_list.html");
+          }
+          break;
+          case "/server/bill/get": {
+            Bill bill = request.getJsonData(Bill.class);
+            Bill billById = billService.getBillById(bill.getId());
+            responseJson(out, billById);
+          }
+          break;
+          case "/server/bill/delete": {
+            Bill bill = request.getJsonData(Bill.class);
+            billService.deleteBilById(bill.getId());
+            responseOk(out);
+          }
+          break;
         }
       }
 
     } catch (Exception e) {
+      e.printStackTrace();
       try {
         HttpStatus status;
         if (e instanceof RequestException) {
@@ -165,6 +207,13 @@ public class HttpServer extends Thread {
       }
     }
 
+  }
+
+  private void loadProviderName(List<Bill> billList) {
+    for (Bill bill : billList) {
+      String name = providerService.getProviderById(bill.getProviderId()).getName();
+      bill.setProviderName(name);
+    }
   }
 
   private static void responseOk(DataOutputStream out) throws IOException {
